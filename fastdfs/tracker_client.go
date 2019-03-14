@@ -155,7 +155,7 @@ func (t *TrackerClient) GetStoreStorageByGroup(trackerServer *TrackerServer, gro
 		return nil, nil
 	}
 
-	ipAddr = strings.TrimSpace(string(pkgInfo.Body[FDFS_GROUP_NAME_MAX_LEN:FDFS_GROUP_NAME_MAX_LEN + FDFS_IPADDR_SIZE - 1]))
+	ipAddr = strings.Trim(string(pkgInfo.Body[FDFS_GROUP_NAME_MAX_LEN:FDFS_GROUP_NAME_MAX_LEN + FDFS_IPADDR_SIZE - 1]), " \x00")
 	port = int(Buff2long(pkgInfo.Body, FDFS_GROUP_NAME_MAX_LEN + FDFS_IPADDR_SIZE - 1))
 	storePath = pkgInfo.Body[TRACKER_QUERY_STORAGE_STORE_BODY_LEN - 1]
 

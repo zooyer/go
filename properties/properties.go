@@ -532,17 +532,17 @@ func (p *Properties) StoreToXMLByEncoding(writer io.Writer, comments, encoding s
 // @return  the value in this property list with the specified key value.
 // @see     #setProperty
 // @see     #defaults
-func (p *Properties) GetProperty(key string) (string, error) {
+func (p *Properties) GetProperty(key string) string {
 	var oval = p.Get(key)
 	if sval,ok := oval.(string); ok {
-		return sval, nil
+		return sval
 	}
 
 	if p.defaults != nil {
 		return p.defaults.GetProperty(key)
 	}
 
-	return "", errors.New("<nil>")
+	return ""
 }
 
 // Searches for the property with the specified key in this property list.
@@ -557,8 +557,8 @@ func (p *Properties) GetProperty(key string) (string, error) {
 // @see     #setProperty
 // @see     #defaults
 func (p *Properties) GetPropertyByDefault(key, defaultValue string) string {
-	value,err := p.GetProperty(key)
-	if err != nil {
+	value := p.GetProperty(key)
+	if value == "" {
 		return defaultValue
 	}
 	return value

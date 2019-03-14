@@ -11,6 +11,7 @@ import (
 	"bufio"
 	"errors"
 	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding/charmap"
 )
 
 type NameValuePair struct {
@@ -130,6 +131,10 @@ func (r *IniFileReader) GetValues(name string) []string {
 		return values
 	}
 
+	if values == nil {
+		return nil
+	}
+
 	return nil
 }
 
@@ -189,6 +194,7 @@ func (r *IniFileReader) readToParamTable(in io.Reader) error {
 
 const (
 	UTF8    = "UTF-8"
+	ISO88591 = "ISO8859-1"
 	GB18030 = "GB18030"
 )
 
@@ -198,10 +204,16 @@ func ConvertByteToString(bytes []byte, charset string) (string, error) {
 	switch charset {
 	case GB18030:
 		var decodeBytes,err = simplifiedchinese.GB18030.NewDecoder().Bytes(bytes)
-		if err != nil {
-			return "", err
+		if err == nil {
+			str = string(decodeBytes)
 		}
-		str= string(decodeBytes)
+		return str, err
+	case ISO88591:
+		var decodeBytes,err = charmap.ISO8859_1.NewDecoder().Bytes(bytes)
+		if err == nil {
+			str = string(decodeBytes)
+		}
+		return str, err
 	case UTF8:
 		fallthrough
 	default:
@@ -215,11 +227,9 @@ func ConvertByteToString(bytes []byte, charset string) (string, error) {
 func ConvertBytesToUTF8(bytes []byte, charset string) ([]byte, error) {
 	switch charset {
 	case GB18030:
-		var decodeBytes,err = simplifiedchinese.GB18030.NewDecoder().Bytes(bytes)
-		if err != nil {
-			return nil, err
-		}
-		return decodeBytes, nil
+		return simplifiedchinese.GB18030.NewDecoder().Bytes(bytes)
+	case ISO88591:
+		return charmap.ISO8859_1.NewDecoder().Bytes(bytes)
 	case UTF8:
 		return bytes, nil
 	}
@@ -229,13 +239,11 @@ func ConvertBytesToUTF8(bytes []byte, charset string) ([]byte, error) {
 
 // bytes is utf8
 func ConvertUTF8ToBytes(bytes []byte, charset string) ([]byte, error) {
-	switch charset {
+	switch strings.ToUpper(strings.Replace(charset, "_", "-", -1)) {
 	case GB18030:
-		var decodeBytes,err = simplifiedchinese.GB18030.NewEncoder().Bytes(bytes)
-		if err != nil {
-			return nil, err
-		}
-		return decodeBytes, nil
+		return simplifiedchinese.GB18030.NewEncoder().Bytes(bytes)
+	case ISO88591:
+		return charmap.ISO8859_1.NewDecoder().Bytes(bytes)
 	case UTF8:
 		return bytes, nil
 	}

@@ -87,13 +87,9 @@ func (x *xmlSupport) toXML(props *Properties) (*XMLProperties, error) {
 	var xp = new(XMLProperties)
 	xp.Entry = make([]XMLReaderEntry, props.Size())
 	for i,key := range props.StringPropertyNames() {
-		var data,err = props.GetProperty(key)
-		if err != nil {
-			return nil, err
-		}
 		xp.Entry[i] = XMLReaderEntry{
 			Key   : key,
-			CDATA : data,
+			CDATA : props.GetProperty(key),
 		}
 	}
 

@@ -89,7 +89,7 @@ func Init(confFilename string) error {
 
 	var trackerServers = make([]net.Addr, len(szTrackerServers))
 	for i := 0; i < len(szTrackerServers); i++ {
-		parts = strings.SplitN(szTrackerServers[i], "\\:", 2)
+		parts = strings.SplitN(szTrackerServers[i], ":", 2)
 		if len(parts) != 2 {
 			return errors.New("the value of item \"tracker_server\" is invalid, the correct format is host:port")
 		}
@@ -143,24 +143,23 @@ func InitByPropertiesFile(propsFilePath string) error {
 }
 
 func InitByProperties(props *properties.Properties) error {
-	var trackerServersConf,err = props.GetProperty(PropKeyTrackerServers)
-	if err != nil {
-		return err
-	}
+	var trackerServersConf = props.GetProperty(PropKeyTrackerServers)
+
 	if trackerServersConf == "" || len(trackerServersConf) == 0 {
 		return fmt.Errorf("configure item %s is required", PropKeyTrackerServers)
 	}
 
-	if err = InitByTrackers(strings.TrimSpace(trackerServersConf)); err != nil {
+	if err := InitByTrackers(strings.TrimSpace(trackerServersConf)); err != nil {
 		return err
 	}
 
-	connectTimeoutInSecondsConf,_ := props.GetProperty(PropKeyConnectTimeoutInSeconds)
-	networkTimeoutInSecondsConf,_ := props.GetProperty(PropKeyNetworkTimeoutInSeconds)
-	charsetConf,_ := props.GetProperty(PropKeyCharset)
-	httpAntiStealTokenConf,_ := props.GetProperty(PropKeyHttpAntiStealToken)
-	httpSecretKeyConf,_ := props.GetProperty(PropKeyHttpSecretKey)
-	httpTrackerHttpPortConf,_ := props.GetProperty(PropKeyHttpTrackerHttpPort)
+	connectTimeoutInSecondsConf := props.GetProperty(PropKeyConnectTimeoutInSeconds)
+	networkTimeoutInSecondsConf := props.GetProperty(PropKeyNetworkTimeoutInSeconds)
+	charsetConf := props.GetProperty(PropKeyCharset)
+	httpAntiStealTokenConf := props.GetProperty(PropKeyHttpAntiStealToken)
+	httpSecretKeyConf := props.GetProperty(PropKeyHttpSecretKey)
+	httpTrackerHttpPortConf := props.GetProperty(PropKeyHttpTrackerHttpPort)
+	var err error
 	if connectTimeoutInSecondsConf != "" && len(strings.TrimSpace(connectTimeoutInSecondsConf)) != 0 {
 		if GConnectTimeout,err = strconv.Atoi(strings.TrimSpace(connectTimeoutInSecondsConf)); err != nil {
 			return err

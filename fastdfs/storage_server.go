@@ -42,6 +42,10 @@ func NewStorageServer(ipAddr string, port, storePath int) (*StorageServer, error
  * @param store_path the store path index on the storage server
  */
 func NewStorageServerByByte(ipAddr string, port int, storePath byte) (*StorageServer, error) {
+	//fmt.Println([]byte(ipAddr))
+	//ipAddr = ipAddr[:len(ipAddr) - 1]
+	//fmt.Println("address:", fmt.Sprintf("%s:%d", ipAddr, port))
+	//fmt.Println("length:", len(ipAddr))
 	addr,err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", ipAddr, port))
 	if err != nil {
 		return nil, err

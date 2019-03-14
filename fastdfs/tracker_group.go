@@ -41,6 +41,8 @@ func NewTrackerGroup(trackerServers []net.Addr) *TrackerGroup {
  * @return connected tracker server, null for fail
  */
 func (t *TrackerGroup) GetConnectionByIndex(serverIndex int) (*TrackerServer, error) {
+	//fmt.Println("timeout:", time.Duration(GConnectTimeout) * time.Microsecond)
+	//conn,err := net.Dial("tcp", t.TrackerServers[serverIndex].String())
 	conn,err := net.DialTimeout("tcp", t.TrackerServers[serverIndex].String(), time.Duration(GConnectTimeout) * time.Microsecond)
 	if err != nil {
 		return nil, err

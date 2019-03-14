@@ -713,8 +713,8 @@ func (s *StorageClient) doUploadFile(cmd byte, groupName, masterFilename, prefix
 		return nil, fmt.Errorf("body length: %d <= %d", len(pkgInfo.Body), FDFS_GROUP_NAME_MAX_LEN)
 	}
 
-	newGroupName = strings.TrimSpace(string(pkgInfo.Body[:FDFS_GROUP_NAME_MAX_LEN]))
-	remoteFilename = string(pkgInfo.Body[FDFS_GROUP_NAME_MAX_LEN:len(pkgInfo.Body) - FDFS_GROUP_NAME_MAX_LEN])
+	newGroupName = strings.Trim(string(pkgInfo.Body[:FDFS_GROUP_NAME_MAX_LEN]), " \x00")
+	remoteFilename = string(pkgInfo.Body[FDFS_GROUP_NAME_MAX_LEN: FDFS_GROUP_NAME_MAX_LEN + len(pkgInfo.Body) - FDFS_GROUP_NAME_MAX_LEN])
 	var results = make([]string, 2)
 	results[0] = newGroupName
 	results[1] = remoteFilename
@@ -1553,7 +1553,7 @@ func (s *StorageClient) QueryFileInfo(groupName, remoteFilename string) (*FileIn
 	var fileSize = Buff2long(pkgInfo.Body, 0)
 	var createTimestamp = Buff2long(pkgInfo.Body, FDFS_PROTO_PKG_LEN_SIZE)
 	var crc32 = int(Buff2long(pkgInfo.Body, 2 * FDFS_PROTO_PKG_LEN_SIZE))
-	var sourceIpAddr = strings.TrimSpace(string(pkgInfo.Body[3 * FDFS_PROTO_PKG_LEN_SIZE:3 * FDFS_PROTO_PKG_LEN_SIZE + FDFS_IPADDR_SIZE]))
+	var sourceIpAddr = strings.Trim(string(pkgInfo.Body[3 * FDFS_PROTO_PKG_LEN_SIZE:3 * FDFS_PROTO_PKG_LEN_SIZE + FDFS_IPADDR_SIZE]), " \x00")
 
 	return NewFileInfo(fileSize, createTimestamp, crc32, sourceIpAddr), nil
 }
@@ -1712,7 +1712,7 @@ func (s *StorageClient) sendDownloadPackage(groupName, remoteFilename string, fi
 	}
 	copy(groupBytes[:groupLen], bs)
 
-	if header,err = PackHeader(STORAGE_PROTO_CMD_DOWNLOAD_FILE, int64(len(bsOffset) + len(groupBytes) + len(filenameBytes)), 0); err != nil {
+	if header,err = PackHeader(STORAGE_PROTO_CMD_DOWNLOAD_FILE, int64(len(bsOffset) + len(bsDownBytes) + len(groupBytes) + len(filenameBytes)), 0); err != nil {
 		return err
 	}
 	var wholePkg = make([]byte, len(header) + len(bsOffset) + len(bsDownBytes) + len(groupBytes) + len(filenameBytes))

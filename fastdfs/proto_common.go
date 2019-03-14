@@ -173,7 +173,7 @@ func RecvHeader(in io.Reader, expectCmd byte, expectBodyLen int64) (*RecvHeaderI
 	if pkgLen < 0 {
 		return nil, fmt.Errorf("recv body length: %d < 0", pkgLen)
 	}
-	fmt.Println("pkgLen:", pkgLen)
+	//fmt.Println("pkgLen:", pkgLen)
 
 	if expectBodyLen >= 0 && pkgLen != expectBodyLen {
 		return nil, fmt.Errorf("recv body length: %d is not correct, expect length: %d", pkgLen, expectBodyLen)
